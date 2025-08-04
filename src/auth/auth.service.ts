@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Response } from "express";
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "src/prisma/prisma.service";
 import * as bcrypt from "bcrypt";
@@ -84,20 +89,24 @@ export class AuthService {
     return { message: "Akkount muvaffaqiyatli faollashtirildi" };
   }
 
-  async login(loginUserDto: LoginUserDto) {
+  async login(loginUserDto: LoginUserDto, res: Response) {
     const user = await this.prisma.user.findUnique({
       where: { email: loginUserDto.email },
     });
+
     if (!user) {
       throw new NotFoundException("Email yoki password notogri");
     }
+
     const isPasswordMatch = await bcrypt.compare(
       loginUserDto.password,
       user.password
     );
+
     if (!isPasswordMatch) {
       throw new NotFoundException("Email yoki password notogri");
     }
+
     const payload = {
       sub: user.id,
       name: user.name,
@@ -105,6 +114,86 @@ export class AuthService {
       email: user.email,
       role: user.role,
     };
-    return this.generateUserTokens(payload);
+
+    const tokens = await this.generateUserTokens(payload);
+
+    res.cookie("refresh_token", tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return {
+      accessToken: tokens.accessToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        surname: user.surname,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  }
+
+  async refreshToken(res: Response) {
+    const refreshToken = res.cookies.refresh_token;
+
+    if (!refreshToken) {
+      throw new NotFoundException("Refresh token not found");
+    }
+
+    const payload = this.jwtService.decode(refreshToken);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    const tokens = await this.generateUserTokens(payload);
+
+    res.cookie("refresh_token", tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return {
+      accessToken: tokens.accessToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        surname: user.surname,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  }
+  async logoutUserFromCookie(res: Response, refreshToken: string | undefined) {
+    if (!refreshToken) {
+      res.clearCookie("refreshToken", { httpOnly: true });
+      throw new UnauthorizedException("Refresh token mavjud emas");
+    }
+
+    try {
+      const payload: any = this.jwtService.verify(refreshToken, {
+        secret: process.env.REFRESH_TOKEN_KEY,
+      });
+
+      await this.prisma.user.update({
+        where: { id: payload.sub },
+        data: { hashed_refresh_token: "" },
+      });
+    } catch {
+      res.clearCookie("refreshToken", { httpOnly: true });
+      throw new UnauthorizedException("Refresh token yaroqsiz");
+    }
+
+    res.clearCookie("refreshToken", { httpOnly: true });
+    return { message: "Chiqish muvaffaqiyatli amalga oshirildi" };
   }
 }

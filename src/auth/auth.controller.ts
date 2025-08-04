@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Res,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger";
@@ -38,7 +45,42 @@ export class AuthController {
     status: 400,
     description: "Email yoki password notog'ri",
   })
-  async login(@Body() loginUserDto: LoginUserDto) {
-    return this.authService.login(loginUserDto);
+  async login(
+    @Body() loginUserDto: LoginUserDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    return this.authService.login(loginUserDto, res as any);
+  }
+
+  @Post("refresh-token")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Foydalanuvchini tizimga kirish" })
+  @ApiBody({ type: LoginUserDto })
+  @ApiResponse({
+    status: 200,
+    description: "Foydalanuvchi muvaffaqiyatli tizimga kirdi",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Email yoki password notog'ri",
+  })
+  async refreshToken(@Res({ passthrough: true }) res: Response) {
+    return this.authService.refreshToken(res as any);
+  }
+
+  @Post("logout")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Foydalanuvchini tizimga kirish" })
+  @ApiBody({ type: LoginUserDto })
+  @ApiResponse({
+    status: 200,
+    description: "Foydalanuvchi muvaffaqiyatli tizimga kirdi",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Email yoki password notog'ri",
+  })
+  async logoutUserFromCookie(@Res({ passthrough: true }) res: Response) {
+    return this.authService.logoutUserFromCookie(res as any);
   }
 }
