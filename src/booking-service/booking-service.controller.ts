@@ -6,17 +6,21 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { BookingServiceService } from "./booking-service.service";
 import { CreateBookingServiceDto } from "./dto/create-booking-service.dto";
 import { UpdateBookingServiceDto } from "./dto/update-booking-service.dto";
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from "@nestjs/swagger";
+import { AuthGuard } from "src/common/guards/auth.guard";
+import { IsStaffGuard } from "src/common/guards/is-staff.guard";
 
 @ApiTags("Booking xizmatlari")
 @Controller("booking-service")
 export class BookingServiceController {
   constructor(private readonly bookingServiceService: BookingServiceService) {}
 
+  @UseGuards(AuthGuard, IsStaffGuard)
   @Post()
   @ApiOperation({ summary: "Yangi booking xizmatini yaratish" })
   @ApiBody({
@@ -27,12 +31,14 @@ export class BookingServiceController {
     return this.bookingServiceService.create(createBookingServiceDto);
   }
 
+  @UseGuards(AuthGuard, IsStaffGuard)
   @Get()
   @ApiOperation({ summary: "Barcha booking xizmatlarini olish" })
   findAll() {
     return this.bookingServiceService.findAll();
   }
 
+  @UseGuards(AuthGuard, IsStaffGuard)
   @Get(":id")
   @ApiOperation({ summary: "ID boyicha booking xizmatini olish" })
   @ApiParam({
@@ -44,6 +50,7 @@ export class BookingServiceController {
     return this.bookingServiceService.findOne(+id);
   }
 
+  @UseGuards(AuthGuard, IsStaffGuard)
   @Patch(":id")
   @ApiOperation({ summary: "Booking xizmatini yangilash" })
   @ApiParam({
@@ -62,6 +69,7 @@ export class BookingServiceController {
     return this.bookingServiceService.update(+id, updateBookingServiceDto);
   }
 
+  @UseGuards(AuthGuard, IsStaffGuard)
   @Delete(":id")
   @ApiOperation({ summary: "Booking xizmatini ochirish" })
   @ApiParam({

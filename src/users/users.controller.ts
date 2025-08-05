@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -17,35 +18,42 @@ import {
   ApiResponse,
   ApiBody,
 } from "@nestjs/swagger";
+import { AuthGuard } from "src/common/guards/auth.guard";
+import { IsAdminGuard } from "src/common/guards/is-admin.guard";
+import { SelfGuard } from "src/common/guards/self.guard";
 
 @ApiTags("Foydalanuvchilar") // Swagger guruh nomi
 @Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
-  @ApiOperation({ summary: "Yangi foydalanuvchini qo‘shish" })
+  @ApiOperation({ summary: "Yangi foydalanuvchini qoshish" })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: 201, description: "Foydalanuvchi yaratildi" })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
+  @UseGuards(AuthGuard, IsAdminGuard)
   @Get()
-  @ApiOperation({ summary: "Barcha foydalanuvchilar ro‘yxatini olish" })
-  @ApiResponse({ status: 200, description: "Foydalanuvchilar ro‘yxati" })
+  @ApiOperation({ summary: "Barcha foydalanuvchilar royxatini olish" })
+  @ApiResponse({ status: 200, description: "Foydalanuvchilar royxati" })
   findAll() {
     return this.usersService.findAll();
   }
 
+  @UseGuards(AuthGuard, SelfGuard)
   @Get(":id")
-  @ApiOperation({ summary: "ID bo‘yicha foydalanuvchini topish" })
+  @ApiOperation({ summary: "ID boyicha foydalanuvchini topish" })
   @ApiParam({ name: "id", description: "Foydalanuvchi ID raqami" })
   @ApiResponse({ status: 200, description: "Foydalanuvchi topildi" })
   findOne(@Param("id") id: string) {
     return this.usersService.findOne(+id);
   }
 
+  @UseGuards(AuthGuard, SelfGuard)
   @Patch(":id")
   @ApiOperation({ summary: "Foydalanuvchini tahrirlash" })
   @ApiParam({ name: "id", description: "Foydalanuvchi ID raqami" })
@@ -58,17 +66,21 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
+  @UseGuards(AuthGuard, IsAdminGuard)
   @Delete(":id")
-  @ApiOperation({ summary: "Foydalanuvchini o‘chirish" })
+  @ApiOperation({ summary: "Foydalanuvchini ochirish" })
   @ApiParam({ name: "id", description: "Foydalanuvchi ID raqami" })
-  @ApiResponse({ status: 200, description: "Foydalanuvchi o‘chirildi" })
+  @ApiResponse({ status: 200, description: "Foydalanuvchi ochirildi" })
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
   }
 
   @Delete("all/delete")
-  @ApiOperation({ summary: "Barcha foydalanuvchilarni o‘chirish" })
-  @ApiResponse({ status: 200, description: "Barcha foydalanuvchilar o‘chirildi" })
+  @ApiOperation({ summary: "Barcha foydalanuvchilarni ochirish" })
+  @ApiResponse({
+    status: 200,
+    description: "Barcha foydalanuvchilar ochirildi",
+  })
   removeAll() {
     return this.usersService.removeAll();
   }

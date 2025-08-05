@@ -26,10 +26,8 @@ export class CreateAdminDto {
   @MinLength(6, { message: "Parol kamida 6 ta belgidan iborat bolishi kerak" })
   password: string;
 
-  @ApiProperty({
-    example: true,
-    description: "Agar admin asosiy yaratuvchi bolsa true boladi",
-  })
-  @IsBoolean({ message: "is_creator faqat true yoki false bolishi mumkin" })
-  is_creator: boolean;
+  @ApiProperty({ example: "admin", description: "Adminning rolisi" })
+  @IsString({ message: "Rol string formatda bolishi kerak" })
+  @IsNotEmpty({ message: "Rol bosh bolishi mumkin emas" })
+  role: string;
 }

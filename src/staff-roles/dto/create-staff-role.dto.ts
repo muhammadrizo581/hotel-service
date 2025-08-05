@@ -6,7 +6,7 @@ export class CreateStaffRoleDto {
     example: "Qabulxona xodimi",
     description: "Xodimning roli nomi",
   })
-  @IsNotEmpty({ message: "Rol nomi bo‘sh bo‘lmasligi kerak" })
-  @IsString({ message: "Rol nomi satr ko‘rinishida bo‘lishi kerak" })
+  @IsNotEmpty({ message: "Rol nomi bosh bolmasligi kerak" })
+  @IsString({ message: "Rol nomi satr korinishida bolishi kerak" })
   name: string;
 }

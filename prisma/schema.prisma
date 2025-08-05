@@ -34,7 +34,7 @@ model User {
 
 model Customers {
   id          Int    @id @default(autoincrement())
-  user_id     Int
+  user_id     Int    @unique
   phone       String
   birthday    String
   expiry_date String
@@ -50,10 +50,11 @@ model Customers {
 }
 
 model Staffs {
-  id            Int @id @default(autoincrement())
-  staff_role_id Int
-  hotel_id      Int
-  user_id       Int @unique
+  id                   Int     @id @default(autoincrement())
+  staff_role_id        Int
+  hotel_id             Int
+  user_id              Int     @unique
+  is_verified_by_admin Boolean @default(false)
 
   User        User?        @relation(fields: [user_id], references: [id])
   Staff_roles Staff_roles? @relation(fields: [staff_role_id], references: [id])
@@ -64,7 +65,7 @@ model Staffs {
 
 model Staff_roles {
   id   Int    @id @default(autoincrement())
-  name String
+  name String @unique
 
   staffs Staffs[]
 
@@ -72,11 +73,13 @@ model Staff_roles {
 }
 
 model Admin {
-  id         Int     @id @default(autoincrement())
-  full_name  String
-  email      String
-  password   String
-  is_creator Boolean @default(false)
+  id                         Int     @id @default(autoincrement())
+  full_name                  String
+  email                      String  @unique
+  password                   String
+  hashed_refresh_token_admin String  @default("")
+  role                       String  @default("admin")
+  is_creator                 Boolean @default(false)
 
   @@map("admins")
 }

@@ -11,13 +11,16 @@ export class AdminsService {
     const isExist = await this.prisma.admin.findFirst({
       where: {
         email: createAdminDto.email,
-      }, 
+      },
     });
     if (isExist) {
       throw new ConflictException("Bu emailda admin mavjud");
     }
     const admin = await this.prisma.admin.create({
-      data: createAdminDto,
+      data: {
+        ...createAdminDto,
+        role: "admin",
+      },
     });
     return admin;
   }

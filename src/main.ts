@@ -2,13 +2,22 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import * as cookieParser from "cookie-parser";
+import { winstonConfig } from "./common/logging/winston.logging";
+import { WinstonModule } from "nest-winston";
+import { AllExeptionsFilter } from "./common/errors/error.handling";
+
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger(winstonConfig),
+  });
 
   const PORT = process.env.PORT || 3030;
-
+  app.use(cookieParser());
   app.setGlobalPrefix("api");
+
+  
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -18,6 +27,7 @@ async function bootstrap() {
     })
   );
 
+  app.useGlobalFilters(new AllExeptionsFilter());
   const config = new DocumentBuilder()
     .setTitle("Onelin Course Project")
     .setDescription("Onelin Course REST API")

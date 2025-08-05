@@ -24,6 +24,11 @@ export class UsersService {
         is_active: false,
       },
     });
+
+    if (user.role !== "staff" && user.role !== "customer") {
+      throw new Error("Role faqat staff va customer bo'lishi mumkin");
+    }
+
     return user;
   }
 

@@ -3,28 +3,28 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class CreatePaymentDto {
   @ApiProperty({ example: 1, description: "Buyurtma ID raqami" })
-  @IsNumber({}, { message: "buyurtma ID son bo‘lishi shart" })
-  @IsNotEmpty({ message: "buyurtma ID bo‘sh bo‘lmasligi kerak" })
+  @IsNumber({}, { message: "buyurtma ID son bolishi shart" })
+  @IsNotEmpty({ message: "buyurtma ID bosh bolmasligi kerak" })
   booking_id: number;
 
-  @ApiProperty({ example: 150000, description: "To‘lov miqdori" })
-  @IsNumber({}, { message: "to‘lov miqdori son bo‘lishi shart" })
-  @Min(1, { message: "to‘lov miqdori kamida 1 bo‘lishi kerak" })
+  @ApiProperty({ example: 150000, description: "Tolov miqdori" })
+  @IsNumber({}, { message: "tolov miqdori son bolishi shart" })
+  @Min(1, { message: "tolov miqdori kamida 1 bolishi kerak" })
   amount: number;
 
   @ApiProperty({
     example: "naqd",
-    description: "To‘lov usuli (masalan: naqd, karta)",
+    description: "Tolov usuli (masalan: naqd, karta)",
   })
-  @IsString({ message: "to‘lov usuli matn bo‘lishi kerak" })
-  @IsNotEmpty({ message: "to‘lov usuli bo‘sh bo‘lmasligi kerak" })
+  @IsString({ message: "tolov usuli matn bolishi kerak" })
+  @IsNotEmpty({ message: "tolov usuli bosh bolmasligi kerak" })
   method: string;
 
   @ApiProperty({
-    example: "to‘langan",
-    description: "To‘lov holati (masalan: to‘langan, kutmoqda)",
+    example: "tolangan",
+    description: "Tolov holati (masalan: tolangan, kutmoqda)",
   })
-  @IsString({ message: "to‘lov holati matn bo‘lishi kerak" })
-  @IsNotEmpty({ message: "to‘lov holati bo‘sh bo‘lmasligi kerak" })
+  @IsString({ message: "tolov holati matn bolishi kerak" })
+  @IsNotEmpty({ message: "tolov holati bosh bolmasligi kerak" })
   status: string;
 }

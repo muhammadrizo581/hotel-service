@@ -6,39 +6,47 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { RoomsService } from "./rooms.service";
 import { CreateRoomDto } from "./dto/create-room.dto";
 import { UpdateRoomDto } from "./dto/update-room.dto";
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { IsAdminGuard } from "src/common/guards/is-admin.guard";
+import { AuthGuard } from "src/common/guards/auth.guard";
+import { SelfGuard } from "src/common/guards/self.guard";
 
 @ApiTags("Xonalar")
 @Controller("rooms")
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
+  @UseGuards(AuthGuard, IsAdminGuard)
   @Post()
-  @ApiOperation({ summary: "Yangi xona qo‘shish" })
-  @ApiResponse({ status: 201, description: "Xona muvaffaqiyatli qo‘shildi" })
+  @ApiOperation({ summary: "Yangi xona qoshish" })
+  @ApiResponse({ status: 201, description: "Xona muvaffaqiyatli qoshildi" })
   create(@Body() createRoomDto: CreateRoomDto) {
     return this.roomsService.create(createRoomDto);
   }
 
+  @UseGuards(AuthGuard, IsAdminGuard)
   @Get()
   @ApiOperation({ summary: "Barcha xonalarni olish" })
-  @ApiResponse({ status: 200, description: "Xonalar ro‘yxati" })
+  @ApiResponse({ status: 200, description: "Xonalar royxati" })
   findAll() {
     return this.roomsService.findAll();
   }
 
+  @UseGuards(AuthGuard, IsAdminGuard)
   @Get(":id")
-  @ApiOperation({ summary: "Xona ID bo‘yicha ma’lumot olish" })
+  @ApiOperation({ summary: "Xona ID boyicha ma’lumot olish" })
   @ApiResponse({ status: 200, description: "Topilgan xona" })
   @ApiResponse({ status: 404, description: "Xona topilmadi" })
   findOne(@Param("id") id: string) {
     return this.roomsService.findOne(+id);
   }
 
+  @UseGuards(AuthGuard, IsAdminGuard)
   @Patch(":id")
   @ApiOperation({ summary: "Xona ma’lumotini yangilash" })
   @ApiResponse({ status: 200, description: "Xona yangilandi" })
@@ -46,9 +54,10 @@ export class RoomsController {
     return this.roomsService.update(+id, updateRoomDto);
   }
 
+  @UseGuards(AuthGuard, IsAdminGuard)
   @Delete(":id")
-  @ApiOperation({ summary: "Xonani o‘chirish" })
-  @ApiResponse({ status: 200, description: "Xona o‘chirildi" })
+  @ApiOperation({ summary: "Xonani ochirish" })
+  @ApiResponse({ status: 200, description: "Xona ochirildi" })
   remove(@Param("id") id: string) {
     return this.roomsService.remove(+id);
   }

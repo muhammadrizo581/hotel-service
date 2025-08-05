@@ -23,13 +23,12 @@ export class MailService {
       await this.mailerService.sendMail({
         to: email,
         subject: "HIsobingizni faollashtiring",
-        template: "./confirmation", 
+        template: "cnfrm",
         context: {
           name: `${name} ${surname}`,
           url,
         },
       });
-      this.logger.log(`Activation link sent to email ${email}`);
     } catch (err) {
       this.logger.error(
         `Failed to send activation link to email ${email}`,

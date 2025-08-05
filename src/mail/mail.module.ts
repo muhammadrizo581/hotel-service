@@ -22,7 +22,7 @@ import { PrismaModule } from "../prisma/prisma.module";
         from: `"Mehmonxona Xizmati" <${process.env.smtp_user}>`,
       },
       template: {
-        dir: join(__dirname, "..", "mail", "templates"),
+        dir: join(__dirname, "templates"),
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true,
