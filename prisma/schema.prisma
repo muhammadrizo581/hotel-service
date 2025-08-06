@@ -34,7 +34,7 @@ model User {
 
 model Customers {
   id          Int    @id @default(autoincrement())
-  user_id     Int    @unique
+  user_id    Int    @unique 
   phone       String
   birthday    String
   expiry_date String
@@ -184,8 +184,8 @@ model Bookings {
   id            Int      @id @default(autoincrement())
   room_id       Int
   customer_id   Int
-  checkin_date  DateTime
-  checkout_date DateTime
+  checkin_date  String
+  checkout_date String
   status        String
 
   payments         Payments[]

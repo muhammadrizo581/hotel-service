@@ -44,7 +44,7 @@ export class UsersService {
     if (!user) {
       throw new Error(`Bu ${id}id dagi foydalanuvchi mavjud emas`);
     }
-    return `${id}-id dagi foydalanuvchi ${user}`;
+    return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
@@ -59,12 +59,12 @@ export class UsersService {
       where: { id },
       data: updateUserDto,
     });
-    return `${id}-id dagi foydalanuvchi yangilandi${updatedUser}`;
+    return updatedUser;
   }
 
   async remove(id: number) {
     const deletedUser = await this.prisma.user.delete({ where: { id } });
-    return `${id}-id dagi foydalanuvchi ochirildi`;
+    return deletedUser;
   }
 
   async removeAll() {

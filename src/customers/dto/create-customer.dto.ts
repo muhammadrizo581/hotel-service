@@ -3,16 +3,19 @@ import {
   IsInt,
   Min,
   IsString,
-  IsNotEmpty,
   Length,
   Matches,
+  IsOptional,
+  isEmail,
 } from "class-validator";
 
 export class CreateCustomerDto {
+  
   @ApiProperty({ example: 1, description: "User ID raqami" })
   @IsInt({ message: "user_id butun son bolishi kerak" })
   @Min(1, { message: "user_id 1 dan katta bolishi kerak" })
-  user_id: number;
+  @IsOptional()
+  user_id?: number;
 
   @ApiProperty({ example: "+998901234567", description: "Telefon raqami" })
   @IsString({ message: "phone satr bolishi kerak" })

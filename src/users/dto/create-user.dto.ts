@@ -19,7 +19,7 @@ export class CreateUserDto {
     example: "ali@example.com",
     description: "Foydalanuvchining email manzili",
   })
-  @IsEmail({}, { message: "Tog‘ri email kiriting" })
+  @IsEmail({}, { message: "Togri email kiriting" })
   @IsNotEmpty({ message: "Email bosh bolmasligi kerak" })
   email: string;
 

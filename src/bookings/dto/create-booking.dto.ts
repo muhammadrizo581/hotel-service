@@ -1,10 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
 import {
   IsInt,
-  IsDateString,
   IsString,
   Min,
-  IsNotEmpty,
+  IsOptional,
 } from "class-validator";
 
 export class CreateBookingDto {
@@ -19,15 +18,15 @@ export class CreateBookingDto {
   customer_id: number;
 
   @ApiProperty({ example: "2025-08-10", description: "Kirish sanasi" })
-  @IsDateString({}, { message: "checkin_date sana formatida bolishi kerak" })
-  checkin_date: Date;
+  @IsString({ message: "checkin_date sana formatida bolishi kerak" })
+  checkin_date: string;
 
   @ApiProperty({ example: "2025-08-15", description: "Chiqish sanasi" })
-  @IsDateString({}, { message: "checkout_date sana formatida bolishi kerak" })
-  checkout_date: Date;
+  @IsString({ message: "checkout_date sana formatida bolishi kerak" })
+  checkout_date: string;
 
   @ApiProperty({ example: "active", description: "Booking holati" })
   @IsString({ message: "status satr (string) formatida bolishi kerak" })
-  @IsNotEmpty({ message: "status toldirilishi shart" })
-  status: string;
+  @IsOptional()
+  status?: string;
 }

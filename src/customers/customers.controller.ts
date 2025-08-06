@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from "@nestjs/common";
 import { CustomersService } from "./customers.service";
 import { CreateCustomerDto } from "./dto/create-customer.dto";
@@ -15,6 +16,7 @@ import { ApiTags, ApiOperation } from "@nestjs/swagger";
 import { AuthGuard } from "src/common/guards/auth.guard";
 import { IsAdminGuard } from "src/common/guards/is-admin.guard";
 import { SelfGuard } from "src/common/guards/self.guard";
+import { Request } from "express";
 
 @ApiTags("Mijozlar")
 @Controller("customers")
@@ -24,8 +26,8 @@ export class CustomersController {
   @UseGuards(AuthGuard)
   @Post()
   @ApiOperation({ summary: "Yangi mijoz yaratish" })
-  create(@Body() createCustomerDto: CreateCustomerDto) {
-    return this.customersService.create(createCustomerDto);
+  create(@Body() createCustomerDto: CreateCustomerDto, @Req() req: Request) {
+    return this.customersService.create(createCustomerDto, req);
   }
 
   @UseGuards(AuthGuard, IsAdminGuard)

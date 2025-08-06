@@ -22,13 +22,13 @@ export class SelfGuard implements CanActivate {
     const isAdmin = user.role === "admin";
 
     if (isNaN(paramId)) {
-      throw new ForbiddenException("ID noto‘g‘ri");
+      throw new ForbiddenException("ID notogri");
     }
 
     if (isAdmin || user.sub === paramId) {
       return true;
     }
 
-    throw new ForbiddenException("Sizga bu amalni bajarishga ruxsat yo‘q");
+    throw new ForbiddenException("Sizga bu amalni bajarishga ruxsat yoq");
   }
 }

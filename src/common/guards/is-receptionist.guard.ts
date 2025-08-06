@@ -18,15 +18,14 @@ export class IsReceptionistGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const authHeader = req.headers["authorization"];
 
-    
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new ForbiddenException("Token yo‘q yoki noto‘g‘ri");
+      throw new ForbiddenException("Token yoq yoki notogri");
     }
 
     const token = authHeader.split(" ")[1];
 
     const payload = this.jwtService.verify(token, {
-      secret: process.env.ACCESS_TOKEN_KEY, 
+      secret: process.env.ACCESS_TOKEN_KEY,
     });
 
     const userId = payload.sub;

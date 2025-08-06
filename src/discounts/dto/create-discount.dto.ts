@@ -41,7 +41,7 @@ export class CreateDiscountDto {
   })
   @IsDateString(
     {},
-    { message: "start_date tog‘ri sana formatida bolishi kerak (YYYY-MM-DD)" }
+    { message: "start_date togri sana formatida bolishi kerak (YYYY-MM-DD)" }
   )
   start_date: Date;
 
@@ -51,7 +51,7 @@ export class CreateDiscountDto {
   })
   @IsDateString(
     {},
-    { message: "end_date tog‘ri sana formatida bolishi kerak (YYYY-MM-DD)" }
+    { message: "end_date togri sana formatida bolishi kerak (YYYY-MM-DD)" }
   )
   end_date: Date;
 

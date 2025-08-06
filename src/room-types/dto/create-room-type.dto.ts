@@ -7,8 +7,8 @@ export class CreateRoomTypeDto {
   @IsNotEmpty({ message: "Xona turi nomi bosh bolishi mumkin emas" })
   name: string;
 
-  @ApiProperty({ example: 2, description: "Nechta odam sig‘adi" })
-  @IsNumber({}, { message: "Sig‘imi raqam bolishi kerak" })
-  @Min(1, { message: "Sig‘im kamida 1 bolishi kerak" })
+  @ApiProperty({ example: 2, description: "Nechta odam sigadi" })
+  @IsNumber({}, { message: "Sigimi raqam bolishi kerak" })
+  @Min(1, { message: "Sigim kamida 1 bolishi kerak" })
   capacity: number;
 }

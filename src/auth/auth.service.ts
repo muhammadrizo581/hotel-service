@@ -15,6 +15,7 @@ import { MailService } from "src/mail/mail.service";
 import { LoginUserDto } from "src/users/dto/login-user.dto";
 import { CreateAdminDto } from "src/admins/dto/create-admin.dto";
 import { LoginAdminDto } from "src/admins/dto/login-admin.dto";
+import { ResetPasswordDto } from "src/users/dto/reset-password.dto";
 
 @Injectable()
 export class AuthService {
@@ -70,9 +71,11 @@ export class AuthService {
     });
 
     if (user.role !== "staff" && user.role !== "customer") {
-      throw new BadRequestException("Role faqat staff va customer bo'lishi mumkin");
+      throw new BadRequestException(
+        "Role faqat staff va customer bo'lishi mumkin"
+      );
     }
-    
+
     await this.mailService.sendActivationLink(
       user.name,
       user.surname,
@@ -96,7 +99,7 @@ export class AuthService {
       where: { activation_link: link },
     });
     if (!user) {
-      throw new NotFoundException("Notog‘ri aktivatsiya linki");
+      throw new NotFoundException("Notogri aktivatsiya linki");
     }
 
     if (user.is_active) {
@@ -155,7 +158,7 @@ export class AuthService {
       surname: user.surname,
       email: user.email,
       role: user.role,
-      is_active:user.is_active
+      is_active: user.is_active,
     };
 
     const tokens = await this.generateUserTokens(payload);
@@ -253,6 +256,87 @@ export class AuthService {
 
     res.clearCookie("refresh_token", { httpOnly: true });
     return { message: "Chiqish muvaffaqiyatli amalga oshirildi" };
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto, req: Request) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new UnauthorizedException("Token yoq yoki notogri");
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = this.jwtService.decode(token) as { email: string };
+
+    const role = this.jwtService.decode(token) as { role: string };
+
+    if (!decoded || !decoded.email) {
+      throw new UnauthorizedException("Tokendan email ajratib bolmadi");
+    }
+
+    if (!role || !role.role) {
+      throw new UnauthorizedException("Tokendan role ajratib bolmadi");
+    }
+
+    if (role.role === "admin") {
+      const email = decoded.email;
+
+      const user = await this.prisma.admin.findUnique({
+        where: { email },
+      });
+
+      const { old_password, new_password, confirm_password } = resetPasswordDto;
+
+      if (!user) {
+        throw new NotFoundException("Foydalanuvchi topilmadi");
+      }
+
+      const isPasswordMatch = await bcrypt.compare(
+        old_password!,
+        user.password
+      );
+
+      if (!isPasswordMatch) {
+        throw new UnauthorizedException("Eski parol notog'ri");
+      }
+
+      const hashedPassword = await bcrypt.hash(new_password, 10);
+
+      await this.prisma.admin.update({
+        where: { id: user.id },
+        data: { password: hashedPassword },
+      });
+
+      return { message: "Parol muvaffaqiyatli o'zgartirildi" };
+    }
+
+    const email = decoded.email;
+
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    const { old_password, new_password, confirm_password } = resetPasswordDto;
+
+    if (!user) {
+      throw new NotFoundException("Foydalanuvchi topilmadi");
+    }
+
+    const isPasswordMatch = await bcrypt.compare(old_password!, user.password);
+
+    if (!isPasswordMatch) {
+      throw new UnauthorizedException("Eski parol notog'ri");
+    }
+
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword },
+    });
+
+    return { message: "Parol muvaffaqiyatli o'zgartirildi" };
   }
 
   async createAdmin(dto: CreateAdminDto) {

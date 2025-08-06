@@ -1,15 +1,55 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { CreateCustomerDto } from "./dto/create-customer.dto";
 import { UpdateCustomerDto } from "./dto/update-customer.dto";
 import { PrismaService } from "src/prisma/prisma.service";
+import { JwtService } from "@nestjs/jwt";
+import { Request } from "express";
 
 @Injectable()
 export class CustomersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService
+  ) {}
 
-  async create(createCustomerDto: CreateCustomerDto) {
+  async create(createCustomerDto: CreateCustomerDto, req: Request) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new UnauthorizedException("Token yoq yoki notogri");
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = this.jwtService.decode(token) as {
+      email: string;
+      role: string;
+      sub: number;
+    };
+
+    if (!decoded || !decoded.email) {
+      throw new UnauthorizedException("Tokendan email ajratib bolmadi");
+    }
+    if (!decoded.sub) {
+      throw new UnauthorizedException("Tokendan id ni ajratib bolmadi");
+    }
+
+    const role = decoded.role;
+
+    const id = decoded.sub;
+    if (role !== "customer") {
+      throw new UnauthorizedException("Siz faqat customer bo'lishingiz mumkin");
+    }
+
     const customer = await this.prisma.customers.create({
-      data: createCustomerDto,
+      data: {
+        ...createCustomerDto,
+        user_id: id,
+      },
     });
     return customer;
   }
@@ -28,7 +68,7 @@ export class CustomersService {
         `Bu ${id}id dagi foydalanuvchi mavjud emas`
       );
     }
-    return `Customer ${id} topildi\n${customer}`;
+    return customer;
   }
 
   async update(id: number, updateCustomerDto: UpdateCustomerDto) {
@@ -45,7 +85,7 @@ export class CustomersService {
       where: { id },
       data: updateCustomerDto,
     });
-    return `Customer ${id} yangilandi\n${updatedCustomer}`;
+    return updatedCustomer;
   }
 
   async remove(id: number) {
@@ -61,6 +101,6 @@ export class CustomersService {
     const deletedCustomer = await this.prisma.customers.delete({
       where: { id },
     });
-    return `Customer ${id} ochirildi\n${deletedCustomer}`;
+    return `${deletedCustomer.id}id dagi mijoz muvaffaqiyatli ochirildi`;
   }
 }

@@ -21,6 +21,7 @@ import { LoginAdminDto } from "src/admins/dto/login-admin.dto";
 import { IsCreatorGuard } from "src/common/guards/is-creator.guard";
 import { AuthGuard } from "src/common/guards/auth.guard";
 import { IsAdminGuard } from "src/common/guards/is-admin.guard";
+import { ResetPasswordDto } from "src/users/dto/reset-password.dto";
 
 @ApiTags("Avtorizatsiya")
 @Controller("auth")
@@ -132,6 +133,27 @@ export class AuthController {
       req.cookies.refresh_token as string
     );
   }
+
+  @UseGuards(AuthGuard)
+  @Post("reset-password")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Parolni o'zgartirish" })
+  @ApiBody({ type: ResetPasswordDto })
+  @ApiResponse({
+    status: 200,
+    description: "Parol muvaffaqiyatli o'zgartirildi",
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Parol notog'ri",
+  })
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+    @Req() req: Request
+  ) {
+    return this.authService.resetPassword(resetPasswordDto, req as any);
+  }
+
 
   @UseGuards(IsCreatorGuard)
   @Post("create-admin")

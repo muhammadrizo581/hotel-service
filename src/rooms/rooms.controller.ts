@@ -15,6 +15,7 @@ import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { IsAdminGuard } from "src/common/guards/is-admin.guard";
 import { AuthGuard } from "src/common/guards/auth.guard";
 import { SelfGuard } from "src/common/guards/self.guard";
+import { FilterRoomsDto } from "./dto/create-room.dto copy";
 
 @ApiTags("Xonalar")
 @Controller("rooms")
@@ -35,6 +36,22 @@ export class RoomsController {
   @ApiResponse({ status: 200, description: "Xonalar royxati" })
   findAll() {
     return this.roomsService.findAll();
+  }
+
+  @UseGuards(AuthGuard)
+  @Get("free")
+  @ApiOperation({ summary: "Barcha mavjud xonalarni olish" })
+  @ApiResponse({ status: 200, description: "Xonalar royxati" })
+  free_rooms() {
+    return this.roomsService.free_rooms();
+  }
+
+  @UseGuards(AuthGuard)
+  @Get("filter")
+  @ApiOperation({ summary: "Xonalarni filtrlash" })
+  @ApiResponse({ status: 200, description: "Xonalarni filtrlash" })
+  filter_rooms(@Body() filterRoomsDto: FilterRoomsDto) {
+    return this.roomsService.filter_rooms(filterRoomsDto);
   }
 
   @UseGuards(AuthGuard, IsAdminGuard)

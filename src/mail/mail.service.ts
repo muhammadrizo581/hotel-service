@@ -37,4 +37,40 @@ export class MailService {
       throw err;
     }
   }
+
+  async sendBookingConfirmation(
+    email: string,
+    fullName: string,
+    checkin_date: string,
+    checkout_date: string,
+    room_number: string
+  ) {
+    try {
+      // Sanalarni faqat YYYY-MM-DD formatga o'tkazish
+      const formattedCheckin = new Date(checkin_date)
+        .toISOString()
+        .split("T")[0];
+      const formattedCheckout = new Date(checkout_date)
+        .toISOString()
+        .split("T")[0];
+
+      await this.mailerService.sendMail({
+        to: email,
+        subject: "Xona band qilindi",
+        template: "about-booking",
+        context: {
+          fullName,
+          checkin_date: formattedCheckin,
+          checkout_date: formattedCheckout,
+          room_number,
+        },
+      });
+    } catch (err) {
+      this.logger.error(
+        `Failed to send booking confirmation to ${email}`,
+        err as any
+      );
+      throw err;
+    }
+  }
 }
